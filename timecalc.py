@@ -1,9 +1,23 @@
 #!/usr/bin/env python3
 
 import datetime
+import re
+import requests
+from bs4 import BeautifulSoup
 
-sin = input("Start time: ")
-ein = input("Endin time: ")
+# get start/end times from dumplog
+dumplog = input("dumplog plz: ")
+r = requests.get(dumplog.rstrip())
+soup = BeautifulSoup(r.text, 'html.parser')
+text = str(soup)
+q = re.search(r'Game began (.*), ended (.*)\.', text)
+sin = q.group(1)
+ein = q.group(2)
+
+# manual command line inputs
+#
+# sin = input("Start time: ")
+# ein = input("Endin time: ")
 
 s = datetime.datetime.fromisoformat(str(sin))
 e = datetime.datetime.fromisoformat(str(ein))
@@ -19,6 +33,8 @@ secs = d.seconds
 time = [days, hrs, mins, secs]
 iso = ""
 for u in time:
+    if u == days and days == 0:
+        continue
     if len(str(u)) == 1:
         iso += "0" + str(u)
     else:
